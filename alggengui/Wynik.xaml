@@ -1,0 +1,15 @@
+﻿<Window x:Class="alggengui.Wynik"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:alggengui"
+        mc:Ignorable="d"
+        Title="Wynik" Height="109.243" Width="336.975" WindowStartupLocation="Manual" SizeToContent="WidthAndHeight">
+    <Grid>
+        <Label Content="Wyniki" HorizontalAlignment="Left" Margin="134,10,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="WynikiTB" HorizontalAlignment="Left" Margin="10,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" ClipToBounds="True" Width="309"/>
+
+
+    </Grid>
+</Window>
