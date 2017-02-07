@@ -12,17 +12,19 @@ namespace alggen
         private double xp;
         private double xk;
         private double zmiennosc;
+        private bool max;
 
-        private Funkcja(double xp, double xk)
+        private Funkcja(double xp, double xk, bool max)
         {
             this.xp = xp;
             this.xk = xk;
             zmiennosc = this.xk - this.xp;
+            this.max = max;
         }
-        public static Funkcja GetInstance(double xp, double xk)
+        public static Funkcja GetInstance(double xp, double xk, bool max)
         {
             if (instance == null)
-                instance = new Funkcja(xp, xk);
+                instance = new Funkcja(xp, xk, max);
 
             return instance;
         }
@@ -49,16 +51,24 @@ namespace alggen
             get { return zmiennosc; }
             set { zmiennosc = value; }
         }
+
+        public bool Max
+        {
+            get { return max; }
+            set { max = value; }
+        }
         public double Oblicz_funkcje(double x)
         {
-            //return x * Math.Sin(10.0 * Math.PI * x) + 1.0;
-            return Math.Sin(2.0 * x) + (Math.Cos(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x));
+            //return 2 * x + 3;
+            return x * Math.Sin(10.0 * Math.PI * x) + 1.0;
+            //return Math.Sin(2.0 * x) + (Math.Cos(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x));
         }
 
         public double Oblicz_pochodna(double x)
         {
-            //return -10.0 * Math.PI * x;
-            return 2.0 * Math.Cos(2.0 * x) - 12.0 * Math.Sin(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x);
+            //return 2;
+            return -10.0 * Math.PI * x;
+            //return 2.0 * Math.Cos(2.0 * x) - 12.0 * Math.Sin(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x);
         }
     }
 
@@ -267,10 +277,12 @@ namespace alggen
         {
             List<Chromosom> nowas = new List<Chromosom>();
             List<Chromosom> nowak = new List<Chromosom>();
+            Select s = new Select();
             Turniejowa s1 = new Turniejowa();
             Rankingowa s2 = new Rankingowa();
 
-            nowas.AddRange(s2.Selekcja(population));
+            s.Ustaw_typ_selekcji(s2);
+            nowas.AddRange(s.Selekcja(population));
             nowak.AddRange(Krzyzowanie());
             nowas.AddRange(nowak);
             population.Clear();
@@ -281,6 +293,7 @@ namespace alggen
         {
             Random r = new Random();
             List<Chromosom> p = new List<Chromosom>();
+            Krzyzowanie k = new Krzyzowanie();
             Jednopunktowe k1 = new Jednopunktowe();
             Dwupunktowe k2 = new Dwupunktowe();
             Trzypunktowe k3 = new Trzypunktowe();
@@ -296,20 +309,31 @@ namespace alggen
                 if (mama == tata)
                     flaga = 1;
             } while (flaga > 0);
-            p.AddRange(k1.Krzyzuj(population[mama], population[tata], population));
+            k.Ustaw_typ_krzyzowania(k1);
+            p.AddRange(k.Krzyzuj(population[mama], population[tata], population));
 
             return p;
         }
 
         public void Szukaj_najlepszego()
         {
-            najlepszy = 0;
-            for (int i = 0; i < population.Count; i++)
-                if (population[i].Fitness < population[najlepszy].Fitness)
-                    najlepszy = i;
+            if (Funkcja.GetInstance().Max == false)
+            {
+                najlepszy = 0;
+                for (int i = 0; i < population.Count; i++)
+                    if (population[i].Fitness < population[najlepszy].Fitness)
+                        najlepszy = i;
+            }
+            else
+            {
+                najlepszy = 0;
+                for (int i = 0; i < population.Count; i++)
+                    if (population[i].Fitness > population[najlepszy].Fitness)
+                        najlepszy = i;
+            }
         }
     }
-
+    
     interface ITypKrzyzowania
     {
         List<Chromosom> Krzyzuj(Chromosom mama, Chromosom tata, List<Chromosom> populacja);
@@ -343,6 +367,8 @@ namespace alggen
                 corka.Mutacja();
                 syn.Inwersja();
                 corka.Inwersja();
+                syn.Eval();
+                corka.Eval();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -402,6 +428,8 @@ namespace alggen
                 corka.Mutacja();
                 syn.Inwersja();
                 corka.Inwersja();
+                syn.Eval();
+                corka.Eval();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -476,6 +504,8 @@ namespace alggen
                 corka.Mutacja();
                 syn.Inwersja();
                 corka.Inwersja();
+                syn.Eval();
+                corka.Eval();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -536,9 +566,13 @@ namespace alggen
         public List<Chromosom> Selekcja(List<Chromosom> populacja)
         {
             List<Chromosom> nowa_p = new List<Chromosom>();
+            List<Chromosom> sortp;
             int ilosc_przedzialow = 20;
 
-            List<Chromosom> sortp=populacja.OrderBy(x => x.Fitness).ToList();
+            if(Funkcja.GetInstance().Max==false)
+                sortp = populacja.OrderBy(x => x.Fitness).ToList();
+            else
+                sortp = populacja.OrderByDescending(x => x.Fitness).ToList();
             for (int j = 0; j < ilosc_przedzialow; j++)
                 nowa_p.Add(sortp[j]);
 
@@ -565,6 +599,114 @@ namespace alggen
             return s.Selekcja(populacja);
         }
     }
+
+    interface IWynik
+    {
+        IWynik Wyswietl_wynik();
+    }
+
+    class Naglowek:IWynik
+    {
+        public Naglowek()
+        {
+
+        }
+
+        public void DodajNaglowek()
+        {
+            Console.WriteLine("Populacja\tx min\t\tf(x) min");
+        }
+
+        public IWynik Wyswietl_wynik()
+        {
+            DodajNaglowek();
+
+            return this;
+        }
+    }
+
+    class Tymczasowy:IWynik
+    {
+        private int a;
+        private double b;
+        private double c;
+        public Tymczasowy(int a, double b, double c)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+        public void Wypisz_tymczasowy()
+        {
+            Console.WriteLine("{0}\t\t{1}\t{2}", a, b, c);
+        }
+
+        public IWynik Wyswietl_wynik()
+        {
+            Wypisz_tymczasowy();
+
+            return this;
+        }
+    }
+
+    class Ostateczny:IWynik
+    {
+        private double a;
+        private double b;
+
+        public Ostateczny(double a, double b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public void Wypisz_ostateczny()
+        {
+            Console.WriteLine("W punkcie: {0}", b);
+            Console.WriteLine("Wynik: {0}", a);
+        }
+
+        public IWynik Wyswietl_wynik()
+        {
+            Wypisz_ostateczny();
+
+            return this;
+        }
+    }
+
+    class Oczekiwane : IWynik
+    {
+        public Oczekiwane()
+        {
+
+        }
+
+        public void Wypisz_oczekiwany()
+        {
+            Console.WriteLine("Znaleziono oczekiwane rozwiazanie");
+        }
+
+        public IWynik Wyswietl_wynik()
+        {
+            Wypisz_oczekiwany();
+
+            return this;
+        }
+    }
+
+    class WyswietlanieWyniku
+    {
+        public WyswietlanieWyniku()
+        {
+
+        }
+        public IWynik Wynik(IWynik w)
+        {
+            IWynik wynik = w;
+
+            return w.Wyswietl_wynik();
+        }
+    }
     class Program
     {
         static void Main(string[] args)
@@ -573,9 +715,11 @@ namespace alggen
             double xk = 2.0;
             double d = 6.0;
             int najlepszy=0;
-            Funkcja funkcja = Funkcja.GetInstance(xp, xk);
+            bool max = false;
+            Funkcja funkcja = Funkcja.GetInstance(xp, xk, max);
             Chromosom_wlasciwosci data = Chromosom_wlasciwosci.GetInstance(d);
             Populacja p = new Populacja();
+            WyswietlanieWyniku wynik = new WyswietlanieWyniku();
             for (int i = 0; i < 400; i++)
             {
                 p.Dodaj_Osobnik();
@@ -584,25 +728,29 @@ namespace alggen
                 Console.WriteLine();*/
             }
 
-            Console.WriteLine("Populacja\tx min\t\tf(x) min");
+            wynik.Wynik(new Naglowek());
+            //Console.WriteLine("Populacja\tx min\t\tf(x) min");
             for (int j = 0; j < 2000; j++)
             {
                 p.Szukaj_najlepszego();
                 if(najlepszy!=p.Najlepszy)
                 {
                     najlepszy = p.Najlepszy;
-                    Console.WriteLine("{0}\t\t{1}\t{2}", j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(),(int)d), Math.Round(p.Population[najlepszy].Fitness,(int)d));
+                    wynik.Wynik(new Tymczasowy(j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d), Math.Round(p.Population[najlepszy].Fitness, (int)d)));
+                    //Console.WriteLine("{0}\t\t{1}\t{2}", j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(),(int)d), Math.Round(p.Population[najlepszy].Fitness,(int)d));
                 }
                 if (Math.Abs(funkcja.Oblicz_pochodna(p.Population[najlepszy].Binarny_na_dziesietny())) < 10e-4)
                 {
-                    Console.WriteLine("Znaleziono oczekiwane rozwiazanie");
+                    wynik.Wynik(new Oczekiwane());
+                    //Console.WriteLine("Znaleziono oczekiwane rozwiazanie");
                     break;
                 }
                 p.Selekcja_krzyzowanie();
             }
             najlepszy = p.Najlepszy;
-            Console.WriteLine("Najlepszy osobnik: {0}", najlepszy);
-            Console.WriteLine("Wynik: {0}", Math.Round(p.Population[najlepszy].Fitness,(int)d));
+            wynik.Wynik(new Ostateczny(Math.Round(p.Population[najlepszy].Fitness, (int)d), Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d)));
+            /*Console.WriteLine("Najlepszy osobnik: {0}", najlepszy);
+            Console.WriteLine("Wynik: {0}", Math.Round(p.Population[najlepszy].Fitness,(int)d));*/
 
             Console.ReadKey();
         }
