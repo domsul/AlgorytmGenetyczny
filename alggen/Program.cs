@@ -51,14 +51,14 @@ namespace alggen
         }
         public double Oblicz_funkcje(double x)
         {
-            return x * Math.Sin(10 * Math.PI * x) + 1.0;
-            //return Math.Sin(2.0 * x) + (Math.Cos(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x));
+            //return x * Math.Sin(10.0 * Math.PI * x) + 1.0;
+            return Math.Sin(2.0 * x) + (Math.Cos(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x));
         }
 
         public double Oblicz_pochodna(double x)
         {
-            return -10 * Math.PI * x;
-            //return 2.0 * Math.Cos(2.0 * x) - 12.0 * Math.Sin(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x);
+            //return -10.0 * Math.PI * x;
+            return 2.0 * Math.Cos(2.0 * x) - 12.0 * Math.Sin(4.0 * x) * Math.Cos(4.0 * x) * Math.Cos(4.0 * x);
         }
     }
 
@@ -282,7 +282,8 @@ namespace alggen
             Random r = new Random();
             List<Chromosom> p = new List<Chromosom>();
             Jednopunktowe k1 = new Jednopunktowe();
-            Trzypunktowe k2 = new Trzypunktowe();
+            Dwupunktowe k2 = new Dwupunktowe();
+            Trzypunktowe k3 = new Trzypunktowe();
             int mama;
             int tata;
             int flaga;
@@ -340,8 +341,8 @@ namespace alggen
                 }
                 syn.Mutacja();
                 corka.Mutacja();
-                /*syn.Inwersja();
-                corka.Inwersja();*/
+                syn.Inwersja();
+                corka.Inwersja();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -361,7 +362,7 @@ namespace alggen
             List<Chromosom> dzieci = new List<Chromosom>();
             Random r = new Random();
 
-            for (int j = ilosc_przedzialow; j < populacja.Count; j++)
+            for (int j = ilosc_przedzialow; j < populacja.Count; j+=2)
             {
                 Chromosom syn = new Chromosom();
                 Chromosom corka = new Chromosom();
@@ -399,8 +400,8 @@ namespace alggen
                 }
                 syn.Mutacja();
                 corka.Mutacja();
-                /*syn.Inwersja();
-                corka.Inwersja();*/
+                syn.Inwersja();
+                corka.Inwersja();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -420,7 +421,7 @@ namespace alggen
             List<Chromosom> dzieci = new List<Chromosom>();
             Random r = new Random();
 
-            for (int k = ilosc_przedzialow; k < populacja.Count; k++)
+            for (int k = ilosc_przedzialow; k < populacja.Count; k+=2)
             {
                 Chromosom syn = new Chromosom();
                 Chromosom corka = new Chromosom();
@@ -473,8 +474,8 @@ namespace alggen
                 }
                 syn.Mutacja();
                 corka.Mutacja();
-                /*syn.Inwersja();
-                corka.Inwersja();*/
+                syn.Inwersja();
+                corka.Inwersja();
                 dzieci.Add(syn);
                 dzieci.Add(corka);
             }
@@ -536,7 +537,6 @@ namespace alggen
         {
             List<Chromosom> nowa_p = new List<Chromosom>();
             int ilosc_przedzialow = 20;
-            int min = 0;
 
             List<Chromosom> sortp=populacja.OrderBy(x => x.Fitness).ToList();
             for (int j = 0; j < ilosc_przedzialow; j++)
@@ -576,24 +576,24 @@ namespace alggen
             Funkcja funkcja = Funkcja.GetInstance(xp, xk);
             Chromosom_wlasciwosci data = Chromosom_wlasciwosci.GetInstance(d);
             Populacja p = new Populacja();
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 400; i++)
             {
                 p.Dodaj_Osobnik();
-                for (int j = 0; j < p.Population[i].Osobnik.Length; j++)
+                /*for (int j = 0; j < p.Population[i].Osobnik.Length; j++)
                     Console.Write(p.Population[i].Osobnik[j]);
-                Console.WriteLine();
+                Console.WriteLine();*/
             }
 
             Console.WriteLine("Populacja\tx min\t\tf(x) min");
-            for (int j = 0; j < 200; j++)
+            for (int j = 0; j < 2000; j++)
             {
                 p.Szukaj_najlepszego();
                 if(najlepszy!=p.Najlepszy)
                 {
                     najlepszy = p.Najlepszy;
-                    Console.WriteLine("{0}\t\t{1}\t{2}", j, p.Population[najlepszy].Binarny_na_dziesietny(), p.Population[najlepszy].Fitness);
+                    Console.WriteLine("{0}\t\t{1}\t{2}", j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(),(int)d), Math.Round(p.Population[najlepszy].Fitness,(int)d));
                 }
-                if (Math.Abs(funkcja.Oblicz_pochodna(p.Population[najlepszy].Binarny_na_dziesietny())) < Math.Pow(10, -d))
+                if (Math.Abs(funkcja.Oblicz_pochodna(p.Population[najlepszy].Binarny_na_dziesietny())) < 10e-4)
                 {
                     Console.WriteLine("Znaleziono oczekiwane rozwiazanie");
                     break;
@@ -602,7 +602,7 @@ namespace alggen
             }
             najlepszy = p.Najlepszy;
             Console.WriteLine("Najlepszy osobnik: {0}", najlepszy);
-            Console.WriteLine("Wynik: {0}", p.Population[najlepszy].Fitness);
+            Console.WriteLine("Wynik: {0}", Math.Round(p.Population[najlepszy].Fitness,(int)d));
 
             Console.ReadKey();
         }
