@@ -20,13 +20,13 @@
             <RadioButton x:Name="MinimumRB" Content="Minimum" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="MinimumRB_Checked" RenderTransformOrigin="0.5,0.5"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="53" Margin="163,160,0,0" VerticalAlignment="Top" Width="103" RenderTransformOrigin="0.5,0.5">
-            <RadioButton x:Name="JpRB" Content="Jednopunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"/>
-            <RadioButton x:Name="DpRB" Content="Dwupunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"/>
-            <RadioButton x:Name="TpRB" Content="Trzypunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"/>
+            <RadioButton x:Name="JpRB" Content="Jednopunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="JpRB_Checked"/>
+            <RadioButton x:Name="DpRB" Content="Dwupunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="DpRB_Checked"/>
+            <RadioButton x:Name="TpRB" Content="Trzypunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="TpRB_Checked"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="38" Margin="357,160,0,0" VerticalAlignment="Top" Width="85" RenderTransformOrigin="0.5,0.5">
-            <RadioButton x:Name="TRB" Content="Turniejowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"/>
-            <RadioButton x:Name="RRB" Content="Rankingowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5"/>
+            <RadioButton x:Name="TRB" Content="Turniejowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="TRB_Checked"/>
+            <RadioButton x:Name="RRB" Content="Rankingowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="RRB_Checked"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="59" Margin="10,38,0,0" VerticalAlignment="Top" Width="147"/>
         <StackPanel HorizontalAlignment="Left" Height="76" Margin="10,43,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-2.477,0.52">

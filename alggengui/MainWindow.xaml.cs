@@ -100,7 +100,6 @@ namespace alggengui
             {
                 instance = new Chromosom_wlasciwosci();
                 dokladnosc = Math.Pow(10, d);
-                //instance.funkcja = Funkcja.GetInstance();
             }
 
             return instance;
@@ -284,30 +283,25 @@ namespace alggengui
             population.Add(new Chromosom());
         }
 
-        public void Selekcja_krzyzowanie()
+        public void Selekcja_krzyzowanie(ITypSelekcji s1, ITypKrzyzowania k1)
         {
             List<Chromosom> nowas = new List<Chromosom>();
             List<Chromosom> nowak = new List<Chromosom>();
             Select s = new Select();
-            Turniejowa s1 = new Turniejowa();
-            Rankingowa s2 = new Rankingowa();
 
-            s.Ustaw_typ_selekcji(s2);
+            s.Ustaw_typ_selekcji(s1);
             nowas.AddRange(s.Selekcja(population));
-            nowak.AddRange(Krzyzowanie());
+            nowak.AddRange(Krzyzowanie(k1));
             nowas.AddRange(nowak);
             population.Clear();
             population.AddRange(nowas);
         }
 
-        private List<Chromosom> Krzyzowanie()
+        private List<Chromosom> Krzyzowanie(ITypKrzyzowania k1)
         {
             Random r = new Random();
             List<Chromosom> p = new List<Chromosom>();
             Krzyzowanie k = new Krzyzowanie();
-            Jednopunktowe k1 = new Jednopunktowe();
-            Dwupunktowe k2 = new Dwupunktowe();
-            Trzypunktowe k3 = new Trzypunktowe();
             int mama;
             int tata;
             int flaga;
@@ -563,8 +557,18 @@ namespace alggengui
             {
                 mini = i * dlugosc_przedzialow;
                 for (int j = mini; j < (i + 1) * dlugosc_przedzialow; j++)
-                    if (populacja[j].Fitness < populacja[mini].Fitness)
-                        mini = j;
+                {
+                    if (Funkcja.GetInstance().Max == false)
+                    {
+                        if (populacja[j].Fitness < populacja[mini].Fitness)
+                            mini = j;
+                    }
+                    else
+                    {
+                        if (populacja[j].Fitness > populacja[mini].Fitness)
+                            mini = j;
+                    }
+                }
                 nowa_p.Add(populacja[mini]);
             }
 
@@ -733,25 +737,14 @@ namespace alggengui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static MainWindow _instance = null;
-
-        public static MainWindow Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new MainWindow();
-                }
-                return _instance;
-            }
-        }
-
         double xp;
         double xk;
         double d;
         int najlepszy = 0;
         bool max;
+        ITypSelekcji selekcja;
+        ITypKrzyzowania krzyzowanie;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -767,62 +760,82 @@ namespace alggengui
             max = true;
         }
 
+        private void JpRB_Checked(object sender, RoutedEventArgs e)
+        {
+            krzyzowanie = new Jednopunktowe();
+        }
+
+        private void DpRB_Checked(object sender, RoutedEventArgs e)
+        {
+            krzyzowanie = new Dwupunktowe();
+        }
+
+        private void TpRB_Checked(object sender, RoutedEventArgs e)
+        {
+            krzyzowanie = new Trzypunktowe();
+        }
+
+        private void TRB_Checked(object sender, RoutedEventArgs e)
+        {
+            selekcja = new Turniejowa();
+        }
+
+        private void RRB_Checked(object sender, RoutedEventArgs e)
+        {
+            selekcja = new Rankingowa();
+        }
+
         private void ObliczB_Click(object sender, RoutedEventArgs e)
         {
-            xp = double.Parse(OdTB.Text);
-            xk = double.Parse(DoTB.Text);
-            d = double.Parse(DTB.Text);
-            
-            Funkcja funkcja = Funkcja.GetInstance(xp, xk, max);
-            Chromosom_wlasciwosci data = Chromosom_wlasciwosci.GetInstance(d);
-            Populacja p = new Populacja();
-            WyswietlanieWyniku wynik = new WyswietlanieWyniku();
-            Wynik w = new Wynik();
-
-            WynikL.Content = "Proszę czekać, trwa wyszukiwanie optymalnego rozwiązania...";
-            WynikL.Refresh();
-            for (int i = 0; i < 400; i++)
+            if (double.Parse(OdTB.Text) >= double.Parse(DoTB.Text) || double.Parse(DTB.Text) > 8)
+                MessageBox.Show("Wartość 'od' musi być MNIEJSZA od wartości 'do'.\nDokładność musi być MNIEJSZA od 8.");
+            else
             {
-                p.Dodaj_Osobnik();
-                /*for (int j = 0; j < p.Population[i].Osobnik.Length; j++)
-                    Console.Write(p.Population[i].Osobnik[j]);
-                Console.WriteLine();*/
-            }
+                xp = double.Parse(OdTB.Text);
+                xk = double.Parse(DoTB.Text);
+                d = double.Parse(DTB.Text);
 
-            w.Show();
-            w.Work(wynik.Wynik(new Naglowek()));
-            //Console.WriteLine("Populacja\tx min\t\tf(x) min");
-            for (int j = 0; j < 2000; j++)
-            {
-                p.Szukaj_najlepszego();
-                if (najlepszy != p.Najlepszy)
-                {
-                    najlepszy = p.Najlepszy;
-                    w.Work(wynik.Wynik(new Tymczasowy(j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d), Math.Round(p.Population[najlepszy].Fitness, (int)d))));
-                    
-                    //Console.WriteLine("{0}\t\t{1}\t{2}", j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(),(int)d), Math.Round(p.Population[najlepszy].Fitness,(int)d));
-                }
-                if (Math.Abs(funkcja.Oblicz_pochodna(p.Population[najlepszy].Binarny_na_dziesietny())) < 10e-4)
-                {
-                    w.Work(wynik.Wynik(new Oczekiwane()));
-                    //Console.WriteLine("Znaleziono oczekiwane rozwiazanie");
-                    break;
-                }
-                p.Selekcja_krzyzowanie();
+
+                Funkcja funkcja = Funkcja.GetInstance(xp, xk, max);
+                Chromosom_wlasciwosci data = Chromosom_wlasciwosci.GetInstance(d);
+                Populacja p = new Populacja();
+                WyswietlanieWyniku wynik = new WyswietlanieWyniku();
+                Wynik w = new Wynik();
+
+                WynikL.Content = "Proszę czekać, trwa wyszukiwanie optymalnego rozwiązania...";
                 WynikL.Refresh();
-                WynikL.Content = (j/20)+"%";
+                for (int i = 0; i < 400; i++)
+                {
+                    p.Dodaj_Osobnik();
+                }
+
+                w.Show();
+                w.Work(wynik.Wynik(new Naglowek()));
+
+                for (int j = 0; j < 2000; j++)
+                {
+                    p.Szukaj_najlepszego();
+                    if (najlepszy != p.Najlepszy)
+                    {
+                        najlepszy = p.Najlepszy;
+                        w.Work(wynik.Wynik(new Tymczasowy(j, Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d), Math.Round(p.Population[najlepszy].Fitness, (int)d))));
+                    }
+                    if (Math.Abs(funkcja.Oblicz_pochodna(p.Population[najlepszy].Binarny_na_dziesietny())) < 10e-4)
+                    {
+                        w.Work(wynik.Wynik(new Oczekiwane()));
+                        break;
+                    }
+                    p.Selekcja_krzyzowanie(selekcja, krzyzowanie);
+                    WynikL.Refresh();
+                    WynikL.Content = (j / 20) + "%";
+                    WynikL.Refresh();
+                }
                 WynikL.Refresh();
+                WynikL.Content = "Znaleziono rozwiązanie!";
+                WynikL.Refresh();
+                najlepszy = p.Najlepszy;
+                MessageBox.Show(wynik.Wynik(new Ostateczny(Math.Round(p.Population[najlepszy].Fitness, (int)d), Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d))));
             }
-            WynikL.Refresh();
-            WynikL.Content = "Znaleziono rozwiązanie!";
-            WynikL.Refresh();
-            najlepszy = p.Najlepszy;
-            MessageBox.Show(wynik.Wynik(new Ostateczny(Math.Round(p.Population[najlepszy].Fitness, (int)d), Math.Round(p.Population[najlepszy].Binarny_na_dziesietny(), (int)d))));
-            /*Console.WriteLine("Najlepszy osobnik: {0}", najlepszy);
-            Console.WriteLine("Wynik: {0}", Math.Round(p.Population[najlepszy].Fitness,(int)d));*/
-
-            //Console.ReadKey();
-
         }
     }
 }
