@@ -1,0 +1,40 @@
+﻿<Window x:Class="alggengui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:alggengui"
+        mc:Ignorable="d"
+        Title="Ekstremum funkcji" Height="350" Width="525">
+    <Grid>
+        <Label Content="Podaj parametry:" HorizontalAlignment="Left" Height="38" Margin="10,0,0,0" VerticalAlignment="Top" Width="178" FontSize="20"/>
+        <TextBox x:Name="OdTB" HorizontalAlignment="Left" Height="21" Margin="43,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="98" RenderTransformOrigin="1.093,0.329"/>
+        <TextBox x:Name="DoTB" HorizontalAlignment="Left" Height="21" Margin="43,70,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="98" RenderTransformOrigin="0.501,1.218"/>
+        <TextBox x:Name="DTB" HorizontalAlignment="Left" Height="23" Margin="85,96,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Znajdź:" HorizontalAlignment="Left" Height="33" Margin="10,137,0,0" VerticalAlignment="Top" Width="86" RenderTransformOrigin="0.5,0.5"/>
+        <Label Content="Krzyżowanie:" HorizontalAlignment="Left" Height="33" Margin="163,137,0,0" VerticalAlignment="Top" Width="146" RenderTransformOrigin="0.5,0.5"/>
+        <Label Content="Selekcja:" HorizontalAlignment="Left" Margin="357,137,0,0" VerticalAlignment="Top" Width="108" Height="25" RenderTransformOrigin="0.5,0.5"/>
+        <Button x:Name="ObliczB" Content="Oblicz!" HorizontalAlignment="Left" Height="29" Margin="174,218,0,0" VerticalAlignment="Top" Width="158" Click="ObliczB_Click"/>
+        <StackPanel HorizontalAlignment="Left" Height="38" Margin="10,160,0,0" VerticalAlignment="Top" Width="86" RenderTransformOrigin="0.5,0.5">
+            <RadioButton x:Name="MaksimumRB" Content="Maksimum" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="MaksimumRB_Checked"/>
+            <RadioButton x:Name="MinimumRB" Content="Minimum" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="MinimumRB_Checked" RenderTransformOrigin="0.5,0.5"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="53" Margin="163,160,0,0" VerticalAlignment="Top" Width="103" RenderTransformOrigin="0.5,0.5">
+            <RadioButton x:Name="JpRB" Content="Jednopunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="JpRB_Checked"/>
+            <RadioButton x:Name="DpRB" Content="Dwupunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="DpRB_Checked"/>
+            <RadioButton x:Name="TpRB" Content="Trzypunktowe" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="TpRB_Checked"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="38" Margin="357,160,0,0" VerticalAlignment="Top" Width="85" RenderTransformOrigin="0.5,0.5">
+            <RadioButton x:Name="TRB" Content="Turniejowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="TRB_Checked"/>
+            <RadioButton x:Name="RRB" Content="Rankingowa" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Checked="RRB_Checked"/>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="59" Margin="10,38,0,0" VerticalAlignment="Top" Width="147"/>
+        <StackPanel HorizontalAlignment="Left" Height="76" Margin="10,43,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-2.477,0.52">
+            <Label Content="Od:" HorizontalAlignment="Left" Height="27" VerticalAlignment="Top" Width="30"/>
+            <Label Content="Do:" HorizontalAlignment="Left" Height="27" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.416,1.278"/>
+            <Label Content="Dokładność:" HorizontalAlignment="Left" Margin="0,0,-34,0" VerticalAlignment="Top"/>
+        </StackPanel>
+        <Label x:Name="WynikL" Content="" HorizontalAlignment="Left" Margin="10,260,0,0" VerticalAlignment="Top" Height="50" Width="463"/>
+
+    </Grid>
+</Window>
